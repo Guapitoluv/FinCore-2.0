@@ -33,7 +33,7 @@ class Group(DomainEntity, MappingNavigableMixin):
     
     
     @classmethod
-    def create_with_name(cls, name: str) -> Self:
+    def create_with_name(cls, name: GroupName) -> Self:
         return cls(EntityId.new(), name)
     
     
