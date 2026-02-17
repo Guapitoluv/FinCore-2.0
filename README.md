@@ -9,8 +9,112 @@ Money management project
 - Explicit typing code
 - Invariant treatment
 
+## Description
+CLI money management project
 
-## Domain class hierarchy:
+## Domain
+Is this part necessary?
+
+### Aggregates
+
+**GroupAggregate**
+Description: GroupAggregate is the aggregate root, used to handle the unique EntityMap that contains all the groups, encapsulating all the work rules involving them.
+```python
+GroupAggregate(
+    groups: EntityMap[Group]
+)
+```
+
+### Entities
+
+**DomainEntity** `Structure, not abstract class`
+```python
+DomainEntity(
+    id: EntityId,
+    name: EntityName,
+    children: EntityMap[DomainEntity]
+)
+```
+
+**Group**
+```python
+Group(
+    id: EntityId,
+    name: GroupName,
+    members: EntityMap[Person]
+)
+```
+
+**Person**
+```python
+Person(
+    id: EntityId,
+    name: PersonName,
+    members: EntityMap[Vault]
+)
+```
+
+**Vault**
+```python
+Vault(
+    id: EntityId,
+    name: VaultName,
+    vaults: EntityMap[Vault],
+    values: Sequence[Money | ScaledMoney]
+)
+```
+
+### ValueObjects
+
+Characteristics:
+- Do not have ID (EntityId)
+- Usually, is a dataclass
+- Immutable
+
+**Money**
+Description: In the future, may I defy as BRLMoney, because it's the format I'm using now (R$5,00 [reais, centavos]). But, for now, have it in mind.
+```python
+Money(
+    reais: int,
+    centavos: int
+)
+```
+
+**ScaledMoney**
+Description: It exists because I'm considering to show how many "banknotes" is there instead just to create a global amount. May I make the Money just let pass fix values (1, 2, 5, 10, 20 etc.).
+```python
+ScaledMoney(
+    money: Money,
+    factor: int
+)
+```
+
+**EntityName**
+Characteristics:
+- Not commit Non-alphanumerics + "_"
+```
+name: yes
+NAME: yes
+Name: yes
+NameSurname: yes
+Name_Surname: yes
+Name123: yes
+Name_123%: not
+```
+
+Types:
+- GroupName
+- PersonName
+- VaultName
+
+```python
+EntityName(
+    _value: str
+)
+```
+
+
+## Domain class hierarchy
 - GroupAggregate
 - Group
 - Person
@@ -27,8 +131,19 @@ Money management project
 `>>> command here`
 
 
-**detail**
-> command != instruction
+**detail**: command != instruction
+```python
+`Command: str # Perhaps encapsulate it later.
+
+Instruction:
+    RawInstruction(_data: str)
+    AnalyzedInstruction(
+        path: InstructionPath,
+        operation: InstructionOperation
+    )
+```
+
+
 command is the name used to refer what you type in this first cli, instructions is what you type in Quickedit.
 
 
@@ -58,7 +173,7 @@ command is the name used to refer what you type in this first cli, instructions 
 # Create a new Vault in Vault
 
 # You could create how many inner vaults you want, like:
-< quickedit >>> Family/Gabriel/Wallet/Travels/To_Paris/With_my_girlfrien/...:
+< quickedit >>> Family/Gabriel/Wallet/Travels/To_Paris/With_my_girlfriend/...:
 # All after the second bar is considered a vault inside other vault, inside other vault etc.
 ```
 
@@ -68,7 +183,7 @@ P.S.: I want to change it soon, because, if you can see it, you have to tell in 
 
 ```python
 # OperationKind.ASSIGN
-# Structure -> <path>: <expr>
+# Structure = <path>: <expr>
 < quickedit >>> Family/Gabriel/Wallet: 10
 # Create a new Money(10) in Vault
 
@@ -80,7 +195,17 @@ P.S.: I want to change it soon, because, if you can see it, you have to tell in 
 # - - -
 
 # OperationKind.GROUP_CREATE
-# Structure -> groups: <expr>
+# Structure = groups: <expr>
 < quickedit >>> groups: Friends
 # It's because the treatment between groups and person, vaults, etc. is different. You can see it in: GroupCreateHandler and AssignHandler
+
+# - - -
+
+# OperationKind.REKEY
+# Structure = <path> -> <expr>
+< quickedit >>> Family -> Friends
+< quickedit >>> Family/Ana -> Anna
+< quickedit >>> Family/Anna/Walet -> Wallet
+# Change the name (rekey)
+# Thinking in make "=>" to transactions
 ```
