@@ -1,0 +1,46 @@
+{
+  "groups": {
+    "group_001": {
+      "name": "main_group",
+      "members": {
+        "person_001": {
+          "name": "Aryel",
+          "vaults": {
+            "vault_001": {
+              "name": "Carteira",
+              "vaults": {
+                "vault_001": {
+                  "name": "Caixa",
+                  "vaults": {},
+                  "values": []
+                }
+              },
+              "values": [
+                {
+                  "kind": "money",
+                  "values": {
+                    "reais": 10,
+                    "centavos": 0
+                  }
+                },
+                {
+                  "kind": "scaled_money",
+                  "values": {
+                    "money": {
+                      "kind": "money",
+                      "values": {
+                        "reais": 5,
+                        "centavos": 0
+                      }
+                    },
+                    "factor": 5
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
